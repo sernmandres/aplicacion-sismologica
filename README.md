@@ -1,3 +1,5 @@
+Proceso
+
 BACKEND
 
 1. consumir la uri earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson y mostrar los datos en consola -- ok
@@ -35,6 +37,7 @@ gem install sinatra
 gem install mongo
 gem install rufus-scheduler
 
+exportar de postman la carpeta con todas los endpoint
 
 FRONEND -- espera
 

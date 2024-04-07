@@ -34,50 +34,51 @@ def reset_program_local
   uri = ENV["URI"]
   # Eliminar todos los documentos existentes en la base de datos
   Database.collection.delete_many({})
-
   response = HTTParty.get(uri)
-  if response.code == 200
+
+  if response.success?
     json_data = JSON.parse(response.body)
-    inserted_count = json_data['features'].size
+    total_records = json_data['features'].size
     Database.collection.insert_many(json_data['features'])
-    puts "Se insertaron #{inserted_count} nuevos registros en la base de datos."
+    puts "Se insertaron #{total_records} nuevos registros en la base de datos."
+  else
+    raise "Error al consultar la URI: #{response.code}"
   end
 end
 
-def delete_old_data(datos)
-  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |doc| doc["id"] }
+def delete_old_data(data)
+  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
 
   # Capturar los ID nuevos comparando los datos de entrada con los datos locales
-  ids_a_eliminar = ids_bd - datos.map{ |feature| feature['id']}
+  ids_to_delete = ids_bd - data.map{ |feature| feature['id']}
 
-  if ids_a_eliminar.empty?
+  if ids_to_delete.empty?
     puts "No hay datos antiguos para eliminar."
   else
-    ids_a_eliminar.each do |id|
+    ids_to_delete.each do |id|
       Database.collection.delete_one({ "id" => id })
       puts "Eliminando registro con ID: #{id}"
     end
-
-    puts "Se eliminaron #{ids_a_eliminar.length} registros viejos."
+    puts "Se eliminaron #{ids_to_delete.length} registros viejos."
   end
 end
 
-def insert_new_data(datos)
+def insert_new_data(data)
   # Obtener los IDs de los elementos en la base de datos en local
-  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |doc| doc["id"] }
+  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
 
   # Capturar los ID nuevos comparando los datos de entrada con los datos locales
-  nuevos_ids = datos.map { |feature| feature['id'] } - ids_bd
+  new_ids = data.map { |feature| feature['id'] } - ids_bd
 
   # Insertar los nuevos elementos en la base de datos
-  nuevos_registros = datos.select { |feature| nuevos_ids.include?(feature['id']) }
+  new_records = data.select { |feature| new_ids.include?(feature['id']) }
 
-  unless nuevos_registros.empty?
-    nuevos_registros.each do |registro|
-      Database.collection.insert_one(registro)
-      puts "Se insertó un nuevo registro con ID: #{registro['id']}"
+  unless new_records.empty?
+    new_records.each do |record|
+      Database.collection.insert_one(record)
+      puts "Se insertó un nuevo registro con ID: #{record['id']}"
     end
-    puts "Se insertaron #{nuevos_registros.size} nuevos registros en la base de datos."
+    puts "Se insertaron #{new_records.size} nuevos registros en la base de datos."
   else
     puts "No hay nuevos datos para agregar."
   end
