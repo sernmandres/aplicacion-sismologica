@@ -1,0 +1,40 @@
+{
+    "type": "Feature",
+    "properties": {
+      "mag": 1.9,
+      "place": "27 km WNW of Anchor Point, Alaska",
+      "time": 1712405992950,
+      "updated": 1712406133403,
+      "tz": null,
+      "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ak0244gme1un",
+      "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ak0244gme1un.geojson",
+      "felt": null,
+      "cdi": null,
+      "mmi": null,
+      "alert": null,
+      "status": "automatic",
+      "tsunami": 0,
+      "sig": 56,
+      "net": "ak",
+      "code": "0244gme1un",
+      "ids": ",ak0244gme1un,",
+      "sources": ",ak,",
+      "types": ",origin,phase-data,",
+      "nst": null,
+      "dmin": null,
+      "rms": 0.62,
+      "gap": null,
+      "magType": "ml",
+      "type": "earthquake",
+      "title": "M 1.9 - 27 km WNW of Anchor Point, Alaska"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -152.3195,
+        59.8274,
+        67.9
+      ]
+    },
+    "id": "ak0244gme1un"
+  }
