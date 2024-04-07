@@ -37,10 +37,15 @@ def reset_program_local
   response = HTTParty.get(uri)
 
   if response.success?
-    json_data = JSON.parse(response.body)
-    total_records = json_data['features'].size
-    Database.collection.insert_many(json_data['features'])
-    puts "Se insertaron #{total_records} nuevos registros en la base de datos."
+    data = JSON.parse(response.body)
+    records_without_nil = filter_data(data['features'])
+    records = validate_range(records_without_nil)
+
+    if records.any?
+      total_records = records.size
+      Database.collection.insert_many(records)
+      puts "Se insertaron #{total_records} nuevos registros en la base de datos."
+    end
   else
     raise "Error al consultar la URI: #{response.code}"
   end
@@ -95,16 +100,70 @@ def update_data
   if response.success?
     puts "Respuesta ok del servidor earthquake.usgs.gov"
     data = JSON.parse(response.body)
-    if data['features'].any?
-      #ids_actuales = data['features'].map{ |feature| feature['id'] }
-      delete_old_data(data['features'])
-      insert_new_data(data['features'])
+    records_without_nil = filter_data(data['features'])
+    records = validate_range(records_without_nil)
+
+    if records.any?
+      delete_old_data(records)
+      insert_new_data(records)
     else
       puts "No hay datos para cargar a la base de datos."
     end
   else
     raise "Error al consultar la URI: #{response.code}"
   end
+end
+
+#Metodo para validar rangos
+def validate_range(data)
+  filtered_data = data.reject do |feature|
+    mag = feature['properties']['mag']
+    lat = feature['geometry']['coordinates'][1]
+    long = feature['geometry']['coordinates'][0]
+    id = feature['id']
+
+    if !mag.between?(-1.0, 10.0)
+      puts "ID #{id}: La magnitud está fuera del rango permitido: #{mag}"
+      true
+    elsif !lat.between?(-90.0, 90.0)
+      puts "ID #{id}: La latitud está fuera del rango permitido: #{lat}"
+      true
+    elsif !long.between?(-180.0, 180.0)
+      puts "ID #{id}: La longitud está fuera del rango permitido: #{long}"
+      true
+    else
+      false
+    end
+  end
+  filtered_data
+end
+
+
+#Metodo para verificar con los criterios de las propiedades
+# en caso de que alguna de estas condiciones no se cumpla no se agrega el registro a la base de datos
+def filter_data(data)
+  filtered_data = data.reject do | feature |
+    if feature['properties']['title'].nil? || 
+      feature['properties']['url'].nil? || 
+      feature['properties']['place'].nil? || 
+      feature['properties']['magType'].nil? || 
+      feature['geometry']['coordinates'].nil? || 
+      feature['geometry']['coordinates'].empty?
+      
+      puts "Registro con ID #{feature['id']} no pasa la validación:"
+      puts "Title: #{feature['properties']['title']}"
+      puts "URL: #{feature['properties']['url']}"
+      puts "Place: #{feature['properties']['place']}"
+      puts "MagType: #{feature['properties']['magType']}"
+      puts "Coordinates: #{feature['geometry']['coordinates']}"
+      puts "-----------------------------------"
+      
+      true # Si algún campo es nil, el registro no pasa la validación
+    else
+      false # Si todos los campos tienen datos, el registro pasa la validación
+    end
+  end
+  filtered_data
 end
 
 # Realizar la tarea una vez al iniciar la aplicación
@@ -118,7 +177,7 @@ reset_program_local
 #Se actualizará cada 10 minutos
 scheduler = Rufus::Scheduler.new
 
-scheduler.every '15s' do
+scheduler.every '10m' do
   update_data
   puts "Se ha ejecutado el Task." 
   puts "-------------------------------------------"
