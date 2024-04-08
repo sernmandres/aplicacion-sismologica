@@ -15,6 +15,65 @@ ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_mont
 Database.connect
 $data_collection = Database.collection(:datos)
 $comments_collection = Database.collection(:comentarios)
+
+post '/api/features/:id/comments' do
+  begin
+    #Capturar el id de /:id/
+    feature_id = params[:id].to_i
+    #Convertir el string a json para capturar la propiedad del body
+    request_data = JSON.parse(request.body.read)
+    comment_body = request_data['body']
+
+    #validación para que no pase vacio el comentario
+    if comment_body.nil? || comment_body.empty?
+      status 400
+      return { error: 'El cuerpo del comentario no puede estar vacío' }.to_json
+    end
+
+    #Validar que el id de /:id/ si este registrado
+    unless $data_collection.find(id: feature_id).first
+      status 400
+      return { error: "El ID #{feature_id} no existe" }.to_json
+    end
+
+    #Insetar o actualizar la informacion de un feature_id
+    $comments_collection.find_one_and_update(
+      { feature_id: feature_id },
+      { '$push': { comments: comment_body } },
+      upsert: true
+    )
+
+    status 201
+    { message: 'Comentario creado exitosamente' }.to_json
+  rescue JSON::ParserError
+    status 400
+    { error: 'Formato JSON inválido en el cuerpo de la solicitud' }.to_json
+  rescue StandardError => e
+    status 500
+    { error: e.message }.to_json
+  end
+end
+
+
+# Ruta principal para el método GET
+get '/api/features' do
+  begin
+    page, per_page = get_pagination_parameters
+    query = get_mag_type_filter
+
+    # Realizar la consulta a la base de datos con paginación y filtros
+    results = get_paginated_results(query, per_page, page)
+
+    # Formato adecuado
+    content_type :json
+    results.to_json
+  rescue StandardError => e
+    # Manejar cualquier error y devolver un mensaje de error
+    status 500
+    { error: e.message }.to_json
+  end
+end
+
 # Método para obtener los parámetros de paginación y validarlos
 def get_pagination_parameters
   page = params[:page]
@@ -61,28 +120,8 @@ def get_paginated_results(query, per_page, page)
   features_array = features.to_a
 
   total_records = $data_collection.count_documents(query)
-  total_pages = (total_records.to_f / per_page).ceil
 
-  { data: features_array, pagination: { current_page: page.to_i, total: total_records, per_page: per_page, total_pages: total_pages } }
-end
-
-# Ruta principal para el método GET
-get '/api/features' do
-  begin
-    page, per_page = get_pagination_parameters
-    query = get_mag_type_filter
-
-    # Realizar la consulta a la base de datos con paginación y filtros
-    results = get_paginated_results(query, per_page, page)
-
-    # Formato adecuado
-    content_type :json
-    results.to_json
-  rescue StandardError => e
-    # Manejar cualquier error y devolver un mensaje de error
-    status 500
-    { error: e.message }.to_json
-  end
+  { data: features_array, pagination: { current_page: page.to_i, total: total_records, per_page: per_page} }
 end
 
 # Metodo para controlar por primera vez el inicio de la aplicación
@@ -232,7 +271,7 @@ reset_program_local
 #Se actualizará cada 10 minutos
 scheduler = Rufus::Scheduler.new
 
-scheduler.every '30s' do
+scheduler.every '5m' do
   update_data
   puts "Se ha ejecutado el Task." 
   puts "-------------------------------------------"

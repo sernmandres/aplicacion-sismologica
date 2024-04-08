@@ -14,6 +14,6 @@ module Database
     end
 
     # Obtener la colección solicitada de la base de datos
-    @client[collection_name.to_sym]
+    @client[collection_name]
   end
 end
