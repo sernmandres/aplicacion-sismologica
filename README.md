@@ -2,7 +2,6 @@
 
 
 Proceso
-
 BACKEND
 
 1. consumir la uri earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson y mostrar los datos en consola -- ok
@@ -21,18 +20,22 @@ que pasa si el id que esta en la db ya no existe en los datos: eliminarlo - ok
 curl -X GET \
 '127.0.0.1:3000/api/features... \
 -H 'Content-Type: application/vnd.api+json' \
--H 'cache-control: no-cache'
+-H 'cache-control: no-cache' -- ok
 
 curl -X GET \
 '127.0.0.1:3000/api/features... \
 -H 'Content-Type: application/vnd.api+json' \
--H 'cache-control: no-cache'
+-H 'cache-control: no-cache' -- ok
+
+validar que si en la uri se pone algun valor que no corresponde no rompa el programa y se controle el error -- ok
 
 6. crear endpoint POST
 curl --request POST \
 --url 127.0.0.1:3000/api/features... \
 --header 'content-type: application/json' \
 --data '{"body": "This is a comment" }'
+
+
 
 Dependencias utilizadas
 gem install httparty

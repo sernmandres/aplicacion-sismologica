@@ -13,33 +13,69 @@ ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_mont
 #Crear conexion a la base de datos noSQL - mongodb
 Database.connect
 
+# Método para obtener los parámetros de paginación y validarlos
+def get_pagination_parameters
+  page = params[:page]
+  per_page = params[:per_page]
 
-get '/test/all' do
-  begin
-    results = Database.collection.find({}).to_a
-    data = { "data": results }  # Agrupar los resultados dentro de un objeto "data"
-    content_type :json
-    data.to_json
-  rescue StandardError => e
-    status 500
-    { error: e.message }.to_json
+  if page && !page.match?(/^\d+$/)
+    status 400
+    halt({ error: "El valor proporcionado para 'page' no es válido" }.to_json)
   end
+
+  if per_page && !per_page.match?(/^\d+$/)
+    status 400
+    halt({ error: "El valor proporcionado para 'per_page' no es válido" }.to_json)
+  end
+  
+  per_page = [per_page.to_i, 1000].min unless per_page.nil?
+
+  [page, per_page]
+end
+# Método para validar y obtener los filtros de mag_type
+def get_mag_type_filter
+  mag_types = params[:mag_type]
+
+  if !mag_types.nil?
+    mag_types = mag_types.split(',') if mag_types.is_a?(String)
+    valid_mag_types = mag_types.select { |type| ['md', 'ml', 'ms', 'mw', 'me', 'mi', 'mb', 'mlg'].include?(type) }
+
+    if valid_mag_types.length != mag_types.length
+      invalid_mag_types = mag_types - valid_mag_types
+      halt 400, { error: "Valores de mag_type no válidos: #{invalid_mag_types.join(', ')}" }.to_json
+    end
+
+    query = { 'attributes.mag_type': { '$in': valid_mag_types } }
+  else
+    query = {}
+  end
+
+  query
 end
 
+# Método para realizar la consulta a la base de datos y obtener los resultados paginados
+def get_paginated_results(query, per_page, page)
+  features = Database.collection.find(query).limit(per_page.to_i).skip((page.to_i - 1) * per_page.to_i)
+  features_array = features.to_a
 
-get '/test' do
+  total_records = Database.collection.count_documents(query)
+  total_pages = (total_records.to_f / per_page).ceil
+
+  { data: features_array, pagination: { current_page: page.to_i, total: total_records, per_page: per_page, total_pages: total_pages } }
+end
+
+# Ruta principal para el método GET
+get '/api/features' do
   begin
-    id = params[:id].to_i # Obtener el ID de los parámetros de la URL
-    puts id
-    result = Database.collection.find({"id" => id}).to_a
+    page, per_page = get_pagination_parameters
+    query = get_mag_type_filter
 
-    # Imprimir el resultado para verificar si hay datos
-    puts "Resultado de la búsqueda por ID #{id}:"
-    puts result.inspect
+    # Realizar la consulta a la base de datos con paginación y filtros
+    results = get_paginated_results(query, per_page, page)
 
-    # Devolver el resultado como JSON
+    # Formato adecuado
     content_type :json
-    result.to_json
+    results.to_json
   rescue StandardError => e
     # Manejar cualquier error y devolver un mensaje de error
     status 500
@@ -195,7 +231,7 @@ reset_program_local
 #Se actualizará cada 10 minutos
 scheduler = Rufus::Scheduler.new
 
-scheduler.every '10s' do
+scheduler.every '30s' do
   update_data
   puts "Se ha ejecutado el Task." 
   puts "-------------------------------------------"
