@@ -1,7 +1,8 @@
 require 'sinatra'
 require 'json'
 require 'httparty'
-require_relative 'database'
+require_relative 'database/Connection'
+require_relative 'database/Structure'
 require 'rufus-scheduler'
 require 'tzinfo/data'
 
@@ -12,14 +13,31 @@ ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_mont
 #Crear conexion a la base de datos noSQL - mongodb
 Database.connect
 
+
+get '/test/all' do
+  begin
+    results = Database.collection.find({}).to_a
+    data = { "data": results }  # Agrupar los resultados dentro de un objeto "data"
+    content_type :json
+    data.to_json
+  rescue StandardError => e
+    status 500
+    { error: e.message }.to_json
+  end
+end
+
+
 get '/test' do
   begin
-    id = params[:id] # Obtener el ID de los parámetros de la URL
+    id = params[:id].to_i # Obtener el ID de los parámetros de la URL
+    puts id
     result = Database.collection.find({"id" => id}).to_a
-    puts "resultado test"
-    puts result
-    json_result = result.map { |doc| doc.to_json }
-    puts json_result
+
+    # Imprimir el resultado para verificar si hay datos
+    puts "Resultado de la búsqueda por ID #{id}:"
+    puts result.inspect
+
+    # Devolver el resultado como JSON
     content_type :json
     result.to_json
   rescue StandardError => e
@@ -40,10 +58,10 @@ def reset_program_local
     data = JSON.parse(response.body)
     records_without_nil = filter_data(data['features'])
     records = validate_range(records_without_nil)
-
-    if records.any?
-      total_records = records.size
-      Database.collection.insert_many(records)
+    new_structure = structure_data(records)
+    if new_structure.any?
+      total_records = new_structure.size
+      Database.collection.insert_many(new_structure)
       puts "Se insertaron #{total_records} nuevos registros en la base de datos."
     end
   else
@@ -102,10 +120,10 @@ def update_data
     data = JSON.parse(response.body)
     records_without_nil = filter_data(data['features'])
     records = validate_range(records_without_nil)
-
-    if records.any?
-      delete_old_data(records)
-      insert_new_data(records)
+    new_structure = structure_data(records)
+    if new_structure.any?
+      delete_old_data(new_structure)
+      insert_new_data(new_structure)
     else
       puts "No hay datos para cargar a la base de datos."
     end
@@ -177,7 +195,7 @@ reset_program_local
 #Se actualizará cada 10 minutos
 scheduler = Rufus::Scheduler.new
 
-scheduler.every '10m' do
+scheduler.every '10s' do
   update_data
   puts "Se ha ejecutado el Task." 
   puts "-------------------------------------------"
