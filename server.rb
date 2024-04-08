@@ -11,8 +11,10 @@ ENV['TZ'] = 'America/Bogota'
 ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson'
 
 #Crear conexion a la base de datos noSQL - mongodb
+# instancias de las collections
 Database.connect
-
+$data_collection = Database.collection(:datos)
+$comments_collection = Database.collection(:comentarios)
 # Método para obtener los parámetros de paginación y validarlos
 def get_pagination_parameters
   page = params[:page]
@@ -55,10 +57,10 @@ end
 
 # Método para realizar la consulta a la base de datos y obtener los resultados paginados
 def get_paginated_results(query, per_page, page)
-  features = Database.collection.find(query).limit(per_page.to_i).skip((page.to_i - 1) * per_page.to_i)
+  features = $data_collection.find(query).limit(per_page.to_i).skip((page.to_i - 1) * per_page.to_i)
   features_array = features.to_a
 
-  total_records = Database.collection.count_documents(query)
+  total_records = $data_collection.count_documents(query)
   total_pages = (total_records.to_f / per_page).ceil
 
   { data: features_array, pagination: { current_page: page.to_i, total: total_records, per_page: per_page, total_pages: total_pages } }
@@ -87,7 +89,7 @@ end
 def reset_program_local
   uri = ENV["URI"]
   # Eliminar todos los documentos existentes en la base de datos
-  Database.collection.delete_many({})
+  $data_collection.delete_many({})
   response = HTTParty.get(uri)
 
   if response.success?
@@ -97,7 +99,7 @@ def reset_program_local
     new_structure = structure_data(records)
     if new_structure.any?
       total_records = new_structure.size
-      Database.collection.insert_many(new_structure)
+      $data_collection.insert_many(new_structure)
       puts "Se insertaron #{total_records} nuevos registros en la base de datos."
     end
   else
@@ -106,7 +108,7 @@ def reset_program_local
 end
 
 def delete_old_data(data)
-  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
+  ids_bd = $data_collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
 
   # Capturar los ID nuevos comparando los datos de entrada con los datos locales
   ids_to_delete = ids_bd - data.map{ |feature| feature['id']}
@@ -115,7 +117,7 @@ def delete_old_data(data)
     puts "No hay datos antiguos para eliminar."
   else
     ids_to_delete.each do |id|
-      Database.collection.delete_one({ "id" => id })
+      $data_collection.delete_one({ "id" => id })
       puts "Eliminando registro con ID: #{id}"
     end
     puts "Se eliminaron #{ids_to_delete.length} registros viejos."
@@ -124,7 +126,7 @@ end
 
 def insert_new_data(data)
   # Obtener los IDs de los elementos en la base de datos en local
-  ids_bd = Database.collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
+  ids_bd = $data_collection.find({}, projection: { _id: 0, id: 1 }).map { |feature| feature["id"] }
 
   # Capturar los ID nuevos comparando los datos de entrada con los datos locales
   new_ids = data.map { |feature| feature['id'] } - ids_bd
@@ -134,7 +136,7 @@ def insert_new_data(data)
 
   unless new_records.empty?
     new_records.each do |record|
-      Database.collection.insert_one(record)
+      $data_collection.insert_one(record)
       puts "Se insertó un nuevo registro con ID: #{record['id']}"
     end
     puts "Se insertaron #{new_records.size} nuevos registros en la base de datos."
@@ -191,7 +193,6 @@ def validate_range(data)
   end
   filtered_data
 end
-
 
 #Metodo para verificar con los criterios de las propiedades
 # en caso de que alguna de estas condiciones no se cumpla no se agrega el registro a la base de datos

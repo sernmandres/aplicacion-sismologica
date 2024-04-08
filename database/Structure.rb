@@ -1,7 +1,6 @@
 require_relative 'Schema'
 require_relative 'ValidateType'
 
-
 def structure_data(data)
   new_structure = []
   generate_id = 1
@@ -23,15 +22,13 @@ def structure_data(data)
     coordinates)
     links = Links.new(attributes_data["url"])
 
-
-
-    test, mensaje = validate_type_data(id, type, attributes, coordinates, links)
-    if test
-      featureSchema = FeatureSchema.new(id: id, type: type,attributes: attributes, links: links)
+    validate, message = validate_type_data(id, type, attributes, coordinates, links)
+    if validate
+      featureSchema = FeatureSchema.new(id: id, type: type, attributes: attributes, links: links)
       generate_id += 1
       new_structure << featureSchema.to_hash
     else
-      puts mensaje
+      puts message
     end
 
   end
