@@ -1,0 +1,11 @@
+.ca_horario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
+.ca_iconoTiempo {
+  width: 50%;
+  height: auto;
+}

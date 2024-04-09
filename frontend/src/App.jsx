@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import Table from './Components/Table';
-import Header from './Components/Header'
+import Table from './Components/Table/Table';
+import Header from './Components/Header/Header'
+import Filter from './Components/Filter/Filter'
+import './App.css'
+import './Fonts.css'
 
 function fetchData(params) {
   let url = 'http://localhost:4567/api/features?';
-  
+
   // Construir la URL con los parámetros de página y por página
   if (params.page) {
     url += `page=${params.page}&`;
@@ -48,7 +51,7 @@ function App() {
   const [searchId, setSearchId] = useState('');
   const [magTypes, setMagTypes] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  
+
   // Valores posibles de mag_type
   const possibleMagTypes = ['md', 'ml', 'ms', 'mw', 'me', 'mi', 'mb', 'mlg'];
 
@@ -64,7 +67,7 @@ function App() {
           // Si la propiedad pagination o total no está definida, muestra un mensaje de error
           console.log("No se encontraron datos de paginación en la respuesta.");
         }
-      })  
+      })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
@@ -85,7 +88,7 @@ function App() {
     const value = parseInt(e.target.value);
     setPage(isNaN(value) || value <= 0 ? 1 : value);
   };
-  
+
   const handlePerPageChange = (e) => {
     const value = parseInt(e.target.value);
     setPerPage(isNaN(value) || value <= 0 ? 1 : value);
@@ -104,80 +107,50 @@ function App() {
     }
   };
 
-
   return (
     <>
       <Header />
-      <div>
-        <label htmlFor="page">Page:</label>
-        <input
-          type="number"
-          id="page"
-          name="page"
-          min="1"
-          value={page}
-          onChange={handlePageChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="perPage">Per Page:</label>
-        <input
-          type="number"
-          id="perPage"
-          name="perPage"
-          min="1"
-          value={perPage}
-          onChange={handlePerPageChange}
-        />
-      </div>
+      <div className='ca_contenedor'>
+        <div id='ca_menu'>meun</div>
 
-      <div>
-        <label htmlFor="search">Search by ID:</label>
-        <input
-          type="text"
-          id="search"
-          name="search"
-          value={searchId}
-          onChange={handleSearchChange}
-        />
-      </div>
+        { /*Aca va todo lo relacionado a la aplicacion principal del metodo GET*/}
+        <div id='ca_contenido'>
 
-      <div>
-        <label>Filter by Mag Type:</label>
-        {possibleMagTypes.map((type) => (
-          <div key={type}>
-            <input
-              type="checkbox"
-              id={type}
-              name="magType"
-              value={type}
-              checked={magTypes.includes(type)}
-              onChange={handleMagTypeChange}
-            />
-            <label htmlFor={type}>{type}</label>
+          <div className='ca_contenedor-tablero'>
+
+          { /*Enunciado de los datos*/}
+            <div className='ca-info-reporte'>
+              <p className='roboto-light ca_bread'> Reportes / sitio web /earthquake.usgs.gov</p>
+              <h2 className='roboto-regular ca_title-bread'>Información tomada de los últimos 30 días</h2>
+            </div>
+
+            { /*Secion de los  filtros*/}
+            <div className='ca_info-tablero'>
+              <Filter
+                page={page}
+                perPage={perPage}
+                handlePageChange={handlePageChange}
+                handlePerPageChange={handlePerPageChange}
+                handleSearchChange={handleSearchChange}
+                possibleMagTypes={possibleMagTypes}
+                magTypes={magTypes}
+                handleMagTypeChange={handleMagTypeChange}
+              />
+            </div>
+
           </div>
-        ))}
-      </div>
 
-      <div>
-        <Table data={filteredData} />
-        {/* <h2>Data:</h2>
-        <ul>
-          {filteredData.map((item) => (
-            <li key={item.id}>
-              <p>{item.id}</p>
-              <a href={item.links ? item.links.external_url : ""}>{item.attributes.title}</a>
-            </li>
-          ))}
-        </ul>
-        {filteredData.length === 0 && (
-          <p>No hay datos disponibles para el filtro seleccionado.</p>
-        )} */}
-      </div>
-      <div>
-        <p>Current Page: {page}</p>
-        <p>Total Pages: {totalPages}</p>
-        <p>Total Records: {totalRecords}</p>
+
+
+          <div>
+            <Table data={filteredData} />
+          </div>
+          <div>
+            <p>Current Page: {page}</p>
+            <p>Total Pages: {totalPages}</p>
+            <p>Total Records: {totalRecords}</p>
+          </div>
+        </div>
       </div>
     </>
 

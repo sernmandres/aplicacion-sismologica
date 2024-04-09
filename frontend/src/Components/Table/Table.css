@@ -1,0 +1,35 @@
+.magnitudes {
+    min-width: 189px;
+}
+
+.ca_size-table {
+    height: 500px;
+}
+
+.ca_sep-table {
+    width: 90%;
+    margin: auto;
+    margin-top: 1em;
+}
+
+.table {
+    background-color: red;
+    height: 600px;
+}
+
+.table thead tr th{
+    border: none;
+    border-bottom: 4px solid rgb(231, 231, 231);
+}
+
+.table tbody tr td{
+    border: none;
+    border-bottom: 1px solid rgb(231, 231, 231);
+    padding-bottom: 10px;
+    background-color: #ffffff;
+    font-size: 0.9em;
+} 
+
+.ca-coordenadas-text {
+    font-size: 0.7em;
+}

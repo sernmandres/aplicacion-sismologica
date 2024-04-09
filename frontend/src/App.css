@@ -1,0 +1,50 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-size: 16px;
+    background-color: #ffffff;
+}
+
+p {
+    margin: 0;
+}
+
+.ca_contenedor {
+    width: 100%;
+    display: flex;
+}
+
+#ca_menu {
+    width: 5%;
+    background-color: orange;
+}
+
+#ca_contenido {
+    width: 95%;
+    background-color: #f5f5f5;
+}
+
+.ca_contenedor-tablero {
+    width: 90%;
+    margin: auto;
+}
+
+.ca_contenedor-tablero {
+    background-color: #f5f5f5;
+}
+
+.ca-info-reporte {
+    margin-top: 2em;
+    padding: 1em 0;
+}
+
+.ca_bread {
+    font-size: 0.8em;
+}
+
+.ca_title-bread {
+    font-size: 2em;
+}
