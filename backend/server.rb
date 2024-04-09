@@ -6,6 +6,13 @@ require_relative 'database/Structure'
 require 'rufus-scheduler'
 require 'tzinfo/data'
 
+# Habilitar CORS para permitir el acceso desde cualquier origen
+before do
+  response.headers['Access-Control-Allow-Origin'] = '*'
+  response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+  response.headers['Access-Control-Allow-Headers'] = 'accept, authorization, origin, content-type'
+end
+
 
 ENV['TZ'] = 'America/Bogota'
 ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson'
@@ -271,7 +278,7 @@ reset_program_local
 #Se actualizará cada 10 minutos
 scheduler = Rufus::Scheduler.new
 
-scheduler.every '5m' do
+scheduler.every '10m' do
   update_data
   puts "Se ha ejecutado el Task." 
   puts "-------------------------------------------"
