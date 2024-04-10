@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import Table from './Components/Table/Table';
 import Header from './Components/Header/Header'
 import Filter from './Components/Filter/Filter'
+import PaginationFilter from './Components/Filter/PaginationFilter'
+import ModalForm from './Components/Modal/ModalForm'
 import './App.css'
 import './Fonts.css'
+import iconComentario from './assets/icon-comentario.png'
 
 function fetchData(params) {
   let url = 'http://localhost:4567/api/features?';
@@ -32,12 +35,10 @@ function fetchData(params) {
       if (responseData.pagination && responseData.pagination.total) {
         return responseData;
       } else {
-        // Resolvemos la promesa con un objeto vacío para indicar que no hay datos disponibles
         return { data: [] };
       }
     })
     .catch((error) => {
-      // No necesitamos hacer nada aquí, ya que estamos manejando el caso de falta de datos en el .then
       console.error('Error fetching data:', error);
     });
 }
@@ -51,6 +52,15 @@ function App() {
   const [searchId, setSearchId] = useState('');
   const [magTypes, setMagTypes] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   // Valores posibles de mag_type
   const possibleMagTypes = ['md', 'ml', 'ms', 'mw', 'me', 'mi', 'mb', 'mlg'];
@@ -84,9 +94,9 @@ function App() {
     setFilteredData(filtered);
   }, [searchId, magTypes, data]);
 
-  const handlePageChange = (e) => {
-    const value = parseInt(e.target.value);
-    setPage(isNaN(value) || value <= 0 ? 1 : value);
+  const handlePageChange = (newPage) => {
+    const value = newPage
+    setPage(isNaN(value) || value < 1 ? 1 : value); // Se asegura de que el valor no sea menor que 1
   };
 
   const handlePerPageChange = (e) => {
@@ -111,17 +121,23 @@ function App() {
     <>
       <Header />
       <div className='ca_contenedor'>
-        <div id='ca_menu'>meun</div>
+        <div id='ca_menu'>
+        <button className='ca_generate-comment' onClick={openModal}>
+          <div className='ca_content-img'>
+          <img src={iconComentario} alt="" />
+          </div>
+          <p className='roboto-light ca_text-menu'>Generar <br/ > comentario</p>
+        </button>
+        </div>
 
         { /*Aca va todo lo relacionado a la aplicacion principal del metodo GET*/}
         <div id='ca_contenido'>
 
           <div className='ca_contenedor-tablero'>
-
-          { /*Enunciado de los datos*/}
+            { /*Enunciado de los datos*/}
             <div className='ca-info-reporte'>
-              <p className='roboto-light ca_bread'> Reportes / sitio web /earthquake.usgs.gov</p>
-              <h2 className='roboto-regular ca_title-bread'>Información tomada de los últimos 30 días</h2>
+              <p className='roboto-light ca_bread'> Reportes / Sitio web / earthquake.usgs.gov </p>
+              <h2 className='roboto-light ca_title-bread'>Información tomada de los <strong className='roboto-bold' >últimos 30 días</strong></h2>
             </div>
 
             { /*Secion de los  filtros*/}
@@ -138,19 +154,21 @@ function App() {
               />
             </div>
 
-          </div>
-
-
-
-          <div>
+            <div>
             <Table data={filteredData} />
+            <PaginationFilter
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalRecords = {totalRecords}
+            />
           </div>
-          <div>
-            <p>Current Page: {page}</p>
-            <p>Total Pages: {totalPages}</p>
-            <p>Total Records: {totalRecords}</p>
+
           </div>
+
         </div>
+
+        <ModalForm isOpen={isModalOpen} onClose={closeModal} />
       </div>
     </>
 

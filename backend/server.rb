@@ -13,6 +13,12 @@ before do
   response.headers['Access-Control-Allow-Headers'] = 'accept, authorization, origin, content-type'
 end
 
+options '*' do
+  response.headers['Allow'] = 'HEAD,GET,PUT,DELETE,OPTIONS'
+  response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept'
+  200
+end
+
 
 ENV['TZ'] = 'America/Bogota'
 ENV['URI'] = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson'

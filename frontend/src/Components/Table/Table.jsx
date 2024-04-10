@@ -1,10 +1,8 @@
 import './Table.css'
 
-function Table({ data }) {
-
+function Table({ data }) {  
   const formatDate = (timeInMillis) => {
     const date = new Date(parseInt(timeInMillis));
-    console.log("date " , date)
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   };
 
@@ -29,16 +27,16 @@ function Table({ data }) {
         <tbody>
           {data.map((item) => (
             <tr key={item.id}>
-              <td className='roboto-light align-middle text-center'>{item.id}</td>
-              <td className='roboto-light align-middle text-center'>{item.type}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.external_id}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.magnitude}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.place}</td>
-              <td className='roboto-light align-middle text-center'>{formatDate(item.attributes.time)}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.tsunami}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.mag_type}</td>
-              <td className='roboto-light align-middle text-center'>{item.attributes.title}</td>
-              <td className='roboto-light align-middle text-center'>
+              <td className='roboto-light  text-center'>{item.id}</td>
+              <td className='roboto-light  text-center'>{item.type}</td>
+              <td className='roboto-light  text-center'>{item.attributes.external_id}</td>
+              <td className='roboto-light  text-center'>{item.attributes.magnitude}</td>
+              <td className='roboto-light  text-center'>{item.attributes.place}</td>
+              <td className='roboto-light  text-center'>{formatDate(item.attributes.time)}</td>
+              <td className='roboto-light  text-center'>{item.attributes.tsunami}</td>
+              <td className='roboto-light  text-center'>{item.attributes.mag_type}</td>
+              <td className='roboto-light  text-center'>{item.attributes.title}</td>
+              <td className='roboto-light  text-center'>
                 <div>
                   <p className='ca-coordenadas-text'>Longitud</p> <p>{item.attributes.coordinates.longitude}</p>
                 </div>
@@ -46,18 +44,18 @@ function Table({ data }) {
                   <p className='ca-coordenadas-text'>Latitud</p>  <p>{item.attributes.coordinates.latitude}</p>
                 </div>
               </td>
-              <td className='align-middle text-center'>
-                <a href={item.links ? item.links.external_url : ""}>
+              <td className=' text-center'>
+                <a className='ca_a-link' href={item.links ? item.links.external_url : ""}>
                   {item.links ? item.links.external_url : "N/A"}
                 </a>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
-      {data.length === 0 && (
-        <p>No hay datos disponibles para el filtro seleccionado.</p>
+        {data.length === 0 && (
+        <p className='ca_msg-nodata roboto-regular'><strong>No hay datos disponibles</strong> para el filtro seleccionado.</p>
       )}
+      </table>      
     </div>
   );
 }

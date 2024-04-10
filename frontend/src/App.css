@@ -5,7 +5,6 @@
 
 body{
     font-size: 16px;
-    background-color: #ffffff;
 }
 
 p {
@@ -19,7 +18,7 @@ p {
 
 #ca_menu {
     width: 5%;
-    background-color: orange;
+    background-color: #394764;
 }
 
 #ca_contenido {
@@ -42,9 +41,11 @@ p {
 }
 
 .ca_bread {
-    font-size: 0.8em;
+    font-size: 0.7em;
+    letter-spacing: 1px;
 }
 
 .ca_title-bread {
+    color: #394764;
     font-size: 2em;
 }

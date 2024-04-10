@@ -10,7 +10,7 @@ function FilterPage({ page, perPage, handlePageChange, handlePerPageChange }) {
           name="page"
           min="1"
           value={page}
-          onChange={handlePageChange}
+          onChange={(e) => handlePageChange(parseInt(e.target.value))}
         />
       </div>
       <div className="title-filter">
@@ -22,7 +22,7 @@ function FilterPage({ page, perPage, handlePageChange, handlePerPageChange }) {
           name="perPage"
           min="1"
           value={perPage}
-          onChange={handlePerPageChange}
+          onChange={(handlePerPageChange)}
         />
       </div>
     </div>

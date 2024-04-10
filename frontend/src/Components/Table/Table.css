@@ -2,19 +2,21 @@
     min-width: 189px;
 }
 
+.table {
+    margin-bottom: 0
+}
+
 .ca_size-table {
-    height: 500px;
+    height: 520px;  
 }
 
 .ca_sep-table {
-    width: 90%;
-    margin: auto;
     margin-top: 1em;
 }
 
 .table {
-    background-color: red;
-    height: 600px;
+    position: relative;
+    min-height: 600px;
 }
 
 .table thead tr th{
@@ -32,4 +34,22 @@
 
 .ca-coordenadas-text {
     font-size: 0.7em;
+}
+
+.ca_a-link {
+    color: #01B5D6;
+}
+
+.ca_msg-nodata {
+    position: absolute;
+    display: block;
+    left: 0;
+    right: 0;
+    top: 8%;
+    background-color: #394764;
+    color: #ffffff;
+    width: 100%;
+    padding: 2em 0;
+    text-align: center;
+    font-size: 1.1em;
 }

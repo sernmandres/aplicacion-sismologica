@@ -6,6 +6,11 @@
 }
 
 .ca_iconoTiempo {
-  width: 50%;
+  width: 90%;
   height: auto;
+}
+
+.ca_espaceIcon {
+  margin-left: 1em;
+  margin-top: 10px;
 }

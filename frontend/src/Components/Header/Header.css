@@ -1,19 +1,16 @@
 .header {
-    background-color: red;
+    background-color: #ffffff;
     padding: 1em 0;
     display: flex;
 }
 
 .ca_logo {
     flex: 70%;
-    background-color: green;
 }
 
 .ca_nombre-hora {
     flex: 30%;
-    background-color: grey;
     align-items: center;
-    background-color: green;
 }
 
 #logoSismo {
