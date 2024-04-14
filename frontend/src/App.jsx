@@ -4,6 +4,7 @@ import Header from './Components/Header/Header'
 import Filter from './Components/Filter/Filter'
 import PaginationFilter from './Components/Filter/PaginationFilter'
 import ModalForm from './Components/Modal/ModalForm'
+import { ToastContainer, toast } from 'react-toastify';
 import './App.css'
 import './Fonts.css'
 import iconComentario from './assets/icon-comentario.png'
@@ -60,6 +61,7 @@ function App() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+
   };
 
   // Valores posibles de mag_type
@@ -117,8 +119,20 @@ function App() {
     }
   };
 
+  const handleAlert = (message) => {
+    console.log("message --> " , message)
+    if(message.status == "error") {
+      toast.error(message.msg);
+    } 
+    else {
+      toast.success(message.msg);
+    }
+   
+  };
+
   return (
     <>
+      <ToastContainer />
       <Header />
       <div className='ca_contenedor'>
         <div id='ca_menu'>
@@ -168,7 +182,7 @@ function App() {
 
         </div>
 
-        <ModalForm isOpen={isModalOpen} onClose={closeModal} />
+        <ModalForm  handleAlert={handleAlert} isOpen={isModalOpen} onClose={closeModal} />
       </div>
     </>
 

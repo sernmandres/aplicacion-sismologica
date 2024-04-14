@@ -32,6 +32,10 @@
     font-size: 0.9em;
 } 
 
+.table tbody  tr:nth-child(even) td {
+    background-color: #dfe6f3
+}
+
 .ca-coordenadas-text {
     font-size: 0.7em;
 }

@@ -27,7 +27,7 @@ function Table({ data }) {
         <tbody>
           {data.map((item) => (
             <tr key={item.id}>
-              <td className='roboto-light  text-center'>{item.id}</td>
+              <td className='roboto-light  text-center'><strong>{item.id}</strong></td>
               <td className='roboto-light  text-center'>{item.type}</td>
               <td className='roboto-light  text-center'>{item.attributes.external_id}</td>
               <td className='roboto-light  text-center'>{item.attributes.magnitude}</td>
@@ -45,7 +45,7 @@ function Table({ data }) {
                 </div>
               </td>
               <td className=' text-center'>
-                <a className='ca_a-link' href={item.links ? item.links.external_url : ""}>
+                <a className='ca_a-link' target="_blank"  rel="noopener noreferrer" href={item.links ? item.links.external_url : ""}>
                   {item.links ? item.links.external_url : "N/A"}
                 </a>
               </td>

@@ -60,6 +60,7 @@
   margin: auto;
   width: 80%;
   min-height: 150px;
+  max-height: 150px;
   border: 1px solid #c5c3c3;
   font-size: 0.8em;
   padding-left: 10px;
@@ -117,4 +118,39 @@
 
 .ca_generate-comment:hover img {
   transform: scale(0.9);
+}
+
+
+@media (max-width: 1366px) {
+
+  .modal-content {
+    width: 32%;
+    height: 70vh;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .ca_generate-comment {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .ca_generate-comment img {
+    width: 60%;
+  }
+
+  .ca_text-menu {
+    margin-top: -10px;
+  }
+
+  .modal-content {
+    width: 80%;
+  }
+
 }

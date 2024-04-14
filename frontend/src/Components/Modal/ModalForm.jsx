@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import './Modal.css';
+import 'react-toastify/dist/ReactToastify.css';
 
-function ModalForm({ isOpen, onClose }) {
+function ModalForm({ handleAlert, isOpen, onClose }) {
   const [formData, setFormData] = useState({
     id: '',
     body: '',
@@ -10,8 +11,7 @@ function ModalForm({ isOpen, onClose }) {
   function enviarComentario(id, mensaje) {
     const url = `http://localhost:4567/api/features/${id}/comments`;
     const bodyData = { body: mensaje };
-    
-    console.log("bodyData " , bodyData)
+
     fetch(url, {
       method: 'POST',
       headers: {
@@ -19,17 +19,24 @@ function ModalForm({ isOpen, onClose }) {
       },
       body: JSON.stringify(bodyData)
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Error al enviar el comentario');
-      }
-      console.log('Comentario enviado exitosamente');
-      // Manejar la respuesta del servidor si es necesario
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      // Manejar errores de la solicitud
-    });
+      .then(response => {
+        if (!response.ok) {
+          handleAlert({
+            "status": "error",
+            "msg": "'No se ha podido registrar el comentario, intenta nuevamente.'"
+          });
+          setFormData({ id: '', body: '' });
+        } else {
+          handleAlert({
+            "status": "success",
+            "msg": "Se ha registrado correctamente el comentario."
+          });
+          setFormData({ id: '', body: '' });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }
 
   const handleChange = (e) => {
@@ -42,44 +49,49 @@ function ModalForm({ isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    enviarComentario(formData.id, formData.body); // Llama a la función enviarComentario con los datos del formulario
+    enviarComentario(formData.id, formData.body);
     onClose();
   };
 
   if (!isOpen) {
-    return null; // Si isOpen es false, el modal no se renderiza
+    return null;
   }
 
   return (
-    <div className="modal-background" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <span className="close-button roboto-bold" onClick={onClose}>&times;</span>
-        <h2 className='roboto-regular text-center ca_title-modal'>Generar comentario</h2>
-        <p className='roboto-light'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In varius lorem ut velit feugiat imperdiet. 
-          Cras vel auctor metus, at porta mauris. Vestibulum tincidunt commodo ante, sed posuere nunc dictum nec.</p>
-        <form onSubmit={handleSubmit}>
-          <label className='roboto-light'># de ID</label>
+    <>
+      <div className="modal-background" onClick={onClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <span className="close-button roboto-bold" onClick={onClose}>&times;</span>
+          <h2 className='roboto-regular text-center ca_title-modal'>Generar comentario</h2>
+          <p className='roboto-light'>Queremos recordarles que el formulario está diseñado específicamente para comentar sobre el sismo <strong className='roboto-bold'>utilizando su ID.</strong> 
+          Asegúrense de incluir toda la información relevante para una <strong className='roboto-bold'>discusión precisa y constructiva.</strong></p>
+          <form onSubmit={handleSubmit}>
+            <label className='roboto-light'># de ID</label>
             <input
-            className='roboto-regular'
-              type="text"
+              className='roboto-regular'
+              type="number"
               name="id"
               value={formData.name}
               onChange={handleChange}
               required
             />
-          
-          <label className='ca_sep-top-label'>Comentario</label>
+
+            <label className='ca_sep-top-label'>Comentario</label>
             <textarea className='roboto-regular'
               name="body"
               value={formData.body}
               onChange={handleChange}
               required
             ></textarea>
-          
-          <button className='roboto-regular' type="submit">Enviar</button>
-        </form>
+
+            <button className='roboto-regular' type="submit">Enviar</button>
+          </form>
+        </div>
       </div>
-    </div>
+
+    </>
+
+
   );
 }
 
