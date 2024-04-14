@@ -106,6 +106,7 @@ def get_pagination_parameters
 
   [page, per_page]
 end
+
 # Método para validar y obtener los filtros de mag_type
 def get_mag_type_filter
   mag_types = params[:mag_type]

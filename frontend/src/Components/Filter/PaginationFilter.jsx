@@ -1,5 +1,5 @@
 function PaginationFilter({ currentPage, totalPages, onPageChange, totalRecords }) {
-
+    /** Componente para generar los botones para mostrar mas o menos páginas de acuerdo a la cantidad de elementos*/
     const goToPage = (pageNumber) => {
         onPageChange(pageNumber);
     };

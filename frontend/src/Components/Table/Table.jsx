@@ -33,7 +33,7 @@ function Table({ data }) {
               <td className='roboto-light  text-center'>{item.attributes.magnitude}</td>
               <td className='roboto-light  text-center'>{item.attributes.place}</td>
               <td className='roboto-light  text-center'>{formatDate(item.attributes.time)}</td>
-              <td className='roboto-light  text-center'>{item.attributes.tsunami}</td>
+              <td className='roboto-light  text-center'>{item.attributes.tsunami === 1 ? "Sí" : "No"}</td>
               <td className='roboto-light  text-center'>{item.attributes.mag_type}</td>
               <td className='roboto-light  text-center'>{item.attributes.title}</td>
               <td className='roboto-light  text-center'>

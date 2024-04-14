@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
 
-gem 'sinatra'
-gem 'httparty'
-gem 'mongo'
-gem 'rufus-scheduler'
-gem 'json'
-gem 'tzinfo-data'
+gem 'sinatra', '~> 4.0.0'
+gem 'httparty', '~> 0.21.0'
+gem 'json', '~> 2.6.3'
+gem 'mongo', '~> 2.20.0'
+gem 'rufus-scheduler', '~> 3.9.1'
+gem 'tzinfo-data', '~> 1.2024.1'

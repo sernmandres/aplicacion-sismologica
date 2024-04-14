@@ -22,12 +22,7 @@ function fetchData(params) {
 
   // Agregar mag_type si está presente
   if (params.magTypes.length > 0) {
-    url += `mag_type=${params.magTypes.join(',')}&`;
-  }
-
-  // Eliminar el último '&' si está presente
-  if (url.endsWith('&')) {
-    url = url.slice(0, -1);
+    url += `mag_type=${params.magTypes.join(',')}`;
   }
 
   return fetch(url)
@@ -54,7 +49,9 @@ function App() {
   const [magTypes, setMagTypes] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const possibleMagTypes = ['md', 'ml', 'ms', 'mw', 'me', 'mi', 'mb', 'mlg'];
 
+  //Permite mostrar u ocultar la ventana modal para la parte de comentar un Feature
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -62,10 +59,7 @@ function App() {
   const closeModal = () => {
     setIsModalOpen(false);
 
-  };
-
-  // Valores posibles de mag_type
-  const possibleMagTypes = ['md', 'ml', 'ms', 'mw', 'me', 'mi', 'mb', 'mlg'];
+  }; 
 
   useEffect(() => {
     fetchData({ page, perPage, magTypes })
@@ -74,7 +68,7 @@ function App() {
           setData(responseData.data);
           setTotalPages(Math.ceil(responseData.pagination.total / perPage));
           setTotalRecords(responseData.pagination.total);
-          setFilteredData(responseData.data); // Actualizar los datos filtrados
+          setFilteredData(responseData.data);
         } else {
           // Si la propiedad pagination o total no está definida, muestra un mensaje de error
           console.log("No se encontraron datos de paginación en la respuesta.");
@@ -119,8 +113,8 @@ function App() {
     }
   };
 
+  //Manejar con Toast las alertas segund el tipo | success : error |
   const handleAlert = (message) => {
-    console.log("message --> " , message)
     if(message.status == "error") {
       toast.error(message.msg);
     } 
@@ -154,7 +148,7 @@ function App() {
               <h2 className='roboto-light ca_title-bread'>Información tomada de los <strong className='roboto-bold' >últimos 30 días</strong></h2>
             </div>
 
-            { /*Secion de los  filtros*/}
+            { /*Seccion de los filtros*/}
             <div className='ca_info-tablero'>
               <Filter
                 page={page}
