@@ -1,10 +1,11 @@
 ## Guía para levantar el servidor y probar la aplicación
 
 ### Levantar Backend
+1. Correr el servidor de mongo en el cmd: `mongod`.
+2. En una terminal en la ruta del backend: comando: `ruby server.rb`.
 
-#### Dependencias
+#### Dependencias Backend
 Las dependencias utilizadas son:
-
 - gem 'sinatra'
 - gem 'httparty'
 - gem 'json'
@@ -12,7 +13,12 @@ Las dependencias utilizadas son:
 - gem 'rufus-scheduler'
 - gem 'tzinfo-data'
 
-#### Proceso
+### Levantar Frontend
+1. **Instalar dependencias:** comando: `npm i`.
+2. En una terminal en la ruta del frontend: comando: `npm run dev`.
+
+
+#### Proceso Backend
 1. **Consumir la URI** `earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson` y mostrar los datos en consola. (Completado)
 2. **Crear la base de datos** con MongoDB. (Completado)
 3. **Crear la tarea** para que se actualice cada 5 minutos (pasar luego para que lo haga cada 10 minutos). (Completado)
@@ -29,14 +35,7 @@ Las dependencias utilizadas son:
 6. **Crear endpoint POST:**
    - `curl --request POST --url 127.0.0.1:3000/api/features --header 'content-type: application/json' --data '{"body": "This is a comment" }'`. (Completado)
 
-### Levantar Frontend
-
-1. **Instalar dependencias:** comando: `npm i`.
-2. Correr el servidor de mongo en el cmd: `mongod`.
-3. En una terminal en la ruta del backend: comando: `ruby server.rb`.
-4. En una terminal en la ruta del frontend: comando: `npm run dev`.
-
-#### Proceso
+#### Proceso Frontend
 - Crear proyecto con React.
 - Crear componente Principal.
 - Realizar Fetch con los endpoints de GET.
@@ -46,6 +45,5 @@ Las dependencias utilizadas son:
 - Generar media queries.
 
 ## Notas
-
 - Para validar si algún registro no pasa la validación de no estar nil, en el método `reset_program_local` agregar: `data['features'][0]['properties']['title'] = nil` después de `data = JSON.parse(response.body)`. Con esto al reiniciar y volver a subir el servidor se comprueba que el primero registro no cumple con las condiciones.
 - Para validar si algún registro no pasa la validación de los valores en los rangos magnitude [-1.0, 10.0], latitude [-90.0, 90.0] y longitude: [-180.0, 180.0], en el método `reset_program_local` agregar: `data['features'][0]['geometry']['coordinates'][1] = -92.0`. Con esto al reiniciar y volver a subir el servidor se comprueba que el primero registro no cumple con las condiciones.
